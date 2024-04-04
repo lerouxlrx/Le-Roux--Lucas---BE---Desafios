@@ -33,9 +33,6 @@ router.get("/products", async (req,res) => {
         }
  
         res.json(objetoResultado)
-        //console.log(objetoResultado)
-        //res.render("productos", objetoResultado)
- 
     } catch (error) {
         console.log ("No se pudieron traer los productos");
         res.status(500).json({error: "Error al leer productos."});

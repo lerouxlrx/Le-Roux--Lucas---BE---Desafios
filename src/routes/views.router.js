@@ -32,9 +32,8 @@ router.get("/products", async (req,res) => {
          prevLink: (productos.prevPage) ? "/?page="+productos.prevPage : null,
          nextLink: (productos.nextPage) ? "/?page="+productos.nextPage : null,
        }
-       //console.log(req.session.user)
-       //res.json(objetoResultado)
-       res.render("productos", {user:req.session.user, payload:productosResultados})
+
+       res.render("productos", {user: req.body.user, payload:productosResultados})
 
    } catch (error) {
        console.log ("No se pudieron traer los productos");
@@ -74,16 +73,10 @@ router.get("/", (req, res) => {
 });
 
 router.get("/login", (req, res) => {
-  if (req.session.login) {
-      return res.redirect("/products");
-  }
   res.render("login");
 });
 
 router.get("/register", (req, res) => {
-  if (req.session.login) {
-      return res.redirect("/products");
-  }
   res.render("register");
 });
 
