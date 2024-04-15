@@ -5,8 +5,10 @@ const ProductManager = require('../controllers/product.manager.db.js');
 const CartManager = require("../controllers/cart.manager.db.js");
 const productManager = new ProductManager();
 const cartManager = new CartManager();
+const passport = require ("passport");
+const { passportCall } = require("../utils/jsonwebtoken.js");
 
-router.get("/products", async (req,res) => {
+router.get("/products", passportCall("jwt"), async (req,res) => {
    const limit = req.query.limit || 10;
    const page = req.query.page || 1;
    const query = req.query.query || null;
@@ -72,12 +74,14 @@ router.get("/", (req, res) => {
   res.redirect("/login");
 });
 
-router.get("/login", (req, res) => {
+router.get("/login",  (req, res) => {
   res.render("login");
 });
 
 router.get("/register", (req, res) => {
   res.render("register");
 });
+
+
 
 module.exports = router; 

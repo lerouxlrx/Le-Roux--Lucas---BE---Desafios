@@ -1,59 +1,24 @@
-const passport = require("passport")
-const local = require("passport-local")
-const GitHub = require("passport-github2")
+const passport = require("passport");
+const GitHub = require("passport-github2");
+const jwt = require("passport-jwt");
 
-const UserModel = require("../models/user.model.js")
-const { createHash, isValidPassword } = require("../utils/hashbcryp")
+const UserModel = require("../models/user.model.js");
+const { createHash, isValidPassword } = require("../utils/hashbcryp");
+const JWTStrategy = jwt.Strategy;
+const ExtractJwt = jwt.ExtractJwt;
 
-
-const LocalStrategy = local.Strategy;
 
 const initializePassport = () => {
-    passport.use("register", new LocalStrategy({
-        passReqToCallback: true, //acceder a obj request
-        usernameField: "email"
-    }, async (req, username, password, done) => {
-        const {first_name, last_name, email, age} = req.body
-        try {
-            let user = await UserModel.findOne({email})
-            if (user) return done(null, false);
-            let newUser = {
-                first_name,
-                last_name,
-                email,
-                age,
-                password: createHash(password)
+    passport.use("jwt", new JWTStrategy({
+        jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
+        secretOrKey: "palabrasecretaparatoken"}, async (jwt_payload, done) => {
+            try {
+                console.log(jwt_payload)
+                return done (null, jwt_payload);
+            } catch (error) {
+                return done (error);
             }
-            let result = await UserModel.create(newUser)
-            return done(null, result)
-        } catch (error) {
-            return done(error)
-        }
     }))
-    passport.use("login", new LocalStrategy({
-        usernameField: "email"
-    }, async(email, password, done) => {
-        try {
-            const user = await UserModel.findOne({email})
-            if (!user) {
-                console.log("No se encontro un usuario con este email.")
-                return done (null, false, {message: "Usuario no encontrado"})
-            }
-            if(!isValidPassword(password,user)) {
-                return done(null, false, { message: "La contraseña no es correcta"})
-            }
-            return done(null, user)
-        } catch (error) {
-            return done(error)
-        }
-    }))
-    passport.serializeUser((user, done) => {
-        done(null, user._id)
-    })
-    passport.deserializeUser(async (id, done) =>{
-        let user = await UserModel.findById({_id:id})
-        done(null, user)
-    })
     passport.use("github", new GitHub({
         clientID: "Iv1.5af32bda262f177d",
         clientSecret: "15926fd617575cbe54bba32d36a5e3d228f4cd58",
@@ -80,6 +45,14 @@ const initializePassport = () => {
             return done(error);
         }
     }))
+}
+
+const cookieExtractor = (req) => {
+    let token = null;
+    if(req && req.cookies) {
+        token = req.cookies["tecommerceCookieToken"]
+    }
+    return token
 }
 
 module.exports = initializePassport

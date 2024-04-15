@@ -3,7 +3,7 @@ const router = express.Router();
 const UserModel = require("../models/user.model.js");
 const { isValidPassword } = require("../utils/hashbcryp.js");
 const passport = require("passport");
-const generateToken = require("../utils/jsonwebtoken.js");
+const {generateToken, passportCall} = require("../utils/jsonwebtoken.js");
 const cookieParser = require("cookie-parser");
 
 //Login con JWT
@@ -48,9 +48,11 @@ router.get("/logout", (req, res) => {
 router.get("/github", passport.authenticate("github", {scope: ["user:email"]}), async (req, res) =>{})
 
 router.get("/githubcallback", passport.authenticate("github", {failureRedirect: "/login"}), async(req, res)=>{
-    req.session.user = req.user;
-    req.session.login = true;
     res.redirect("/products");
 })
+
+router.get("/current", passportCall("jwt"), (req, res) => {
+    res.send(req.user);
+  })
 
 module.exports = router;

@@ -3,7 +3,7 @@ const router = express.Router();
 const UserModel = require("../models/user.model.js");
 const { createHash } = require("../utils/hashbcryp.js");
 const passport = require("passport");
-const generateToken = require("../utils/jsonwebtoken.js");
+const {generateToken} = require("../utils/jsonwebtoken.js");
 
 //Register con JWT
 router.post("/", async (req, res) => {
